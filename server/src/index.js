@@ -1,11 +1,11 @@
-import {} from 'dotenv/config.js';
+import { } from 'dotenv/config.js';
 import fs from 'fs';
 import https from 'https';
 import readline from 'readline';
 import WebSocket from 'ws';
 import { EXIT, HELP, REMOVE_PLAYER, RESTART, SET_DECKS, SKIP, UPDATE } from './constants/commands.js';
-import { PLAYER_ACTION_RESPONSE, PLAYER_INIT, SERVER_ERROR } from './constants/messages.js';
-import { CHOOSE, CONTINUE, FUCK_YOU, RED_OR_BLACK, WAITING, WAITING_FOR_PLAYER } from './constants/statuses.js';
+import { PLAYER_INIT, SERVER_ERROR } from './constants/messages.js';
+import { CHOOSE, CONTINUE, FUCK_YOU, RED_OR_BLACK } from './constants/statuses.js';
 import {
   broadcastGameState,
   handleRedOrBlackChoice,
@@ -14,7 +14,6 @@ import {
   populateDeck,
   removePlayer,
   restartGame,
-  sendPlayerActionRequest,
   setPlayerStatus,
   updateCurrentGame
 } from './game.js';
@@ -113,7 +112,6 @@ wss.on('connection', (ws) => {
           default:
             break;
         }
-
         broadcastGameState(gameState, clients);
         break;
       default:

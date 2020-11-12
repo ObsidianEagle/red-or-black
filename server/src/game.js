@@ -4,7 +4,7 @@ import {
   CLUBS,
   DIAMONDS,
   FUCK_YOU,
-  GIVING_DRINK,
+  GIVE_DRINK,
   HEARTS,
   INBETWEEN,
   LOWER,
@@ -12,7 +12,7 @@ import {
   RIDE_THE_BUS,
   SAME,
   SPADES,
-  TAKING_DRINK
+  TAKE_DRINK
 } from './constants/statuses';
 
 export const populateDeck = (numberOfDecks) => {
@@ -172,9 +172,9 @@ export const handleRedOrBlackChoice = (gameState, choice, playerId) => {
         (choice === RED && (drawnCard.suit === HEARTS || drawnCard.suit === DIAMONDS)) ||
         (choice === BLACK && (drawnCard.suit === SPADES || drawnCard.suit === CLUBS))
       ) {
-        setPlayerStatus(gameState, playerId, GIVING_DRINK);
+        setPlayerStatus(gameState, playerId, GIVE_DRINK);
       } else {
-        setPlayerStatus(gameState, playerId, TAKING_DRINK);
+        setPlayerStatus(gameState, playerId, TAKE_DRINK);
       }
       break;
     case 1:
@@ -187,9 +187,9 @@ export const handleRedOrBlackChoice = (gameState, choice, playerId) => {
           (choice === SAME && drawnCardValue < playerCardValue)) &&
         !playerHoldsJoker
       ) {
-        setPlayerStatus(gameState, playerId, GIVING_DRINK);
+        setPlayerStatus(gameState, playerId, GIVE_DRINK);
       } else {
-        setPlayerStatus(gameState, playerId, TAKING_DRINK);
+        setPlayerStatus(gameState, playerId, TAKE_DRINK);
       }
       break;
     case 2:
@@ -203,9 +203,9 @@ export const handleRedOrBlackChoice = (gameState, choice, playerId) => {
           (choice === INBETWEEN && drawnCardValue > lowerPlayerCardValue && drawnCardValue < upperPlayerCardValue)) &&
         !playerHoldsJoker
       ) {
-        setPlayerStatus(gameState, playerId, GIVING_DRINK);
+        setPlayerStatus(gameState, playerId, GIVE_DRINK);
       } else {
-        setPlayerStatus(gameState, playerId, TAKING_DRINK);
+        setPlayerStatus(gameState, playerId, TAKE_DRINK);
       }
       break;
     case 3:
@@ -216,16 +216,16 @@ export const handleRedOrBlackChoice = (gameState, choice, playerId) => {
         (choice === DIAMONDS && drawnCard.suit === DIAMONDS) ||
         (choice === HEARTS && drawnCard.suit === HEARTS)
       ) {
-        setPlayerStatus(gameState, playerId, GIVING_DRINK);
+        setPlayerStatus(gameState, playerId, GIVE_DRINK);
       } else {
-        setPlayerStatus(gameState, playerId, TAKING_DRINK);
+        setPlayerStatus(gameState, playerId, TAKE_DRINK);
       }
       break;
     case 4:
       if (drawnCard.value === choice.value && drawnCard.suit === choice.suit) {
-        setPlayerStatus(gameState, playerId, GIVING_DRINK);
+        setPlayerStatus(gameState, playerId, GIVE_DRINK);
       } else {
-        setPlayerStatus(gameState, playerId, TAKING_DRINK);
+        setPlayerStatus(gameState, playerId, TAKE_DRINK);
       }
       break;
     default:
