@@ -4,9 +4,10 @@ export const FUCK_YOU = 'FUCK_YOU';
 export const RIDE_THE_BUS = 'RIDE_THE_BUS';
 
 // PLAYER ACTIONS
-export const GIVE_DRINK = 'GIVE_DRINK';
 export const TAKE_DRINK = 'TAKE_DRINK';
+export const GIVE_DRINK = 'GIVE_DRINK';
 export const CHOOSE = 'CHOOSE';
+export const CONTINUE = 'CONTINUE';
 
 // CHOICES
 export const HEARTS = 'HEARTS';

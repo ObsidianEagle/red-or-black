@@ -1,11 +1,10 @@
 import { RED_OR_BLACK } from './constants/games';
-import { PLAYER_ACTION_REQUEST } from './constants/messages';
 import {
   BLACK,
   CLUBS,
   DIAMONDS,
   FUCK_YOU,
-  GIVE_DRINK,
+  GIVING_DRINK,
   HEARTS,
   INBETWEEN,
   LOWER,
@@ -13,7 +12,7 @@ import {
   RIDE_THE_BUS,
   SAME,
   SPADES,
-  TAKE_DRINK
+  TAKING_DRINK
 } from './constants/statuses';
 
 export const populateDeck = (numberOfDecks) => {
@@ -150,20 +149,6 @@ export const cardValueToNumericalValue = (cardValue) => {
   return numericalValues[cardValue];
 };
 
-export const sendPlayerActionRequest = (gameState, action, ws) => {
-  const msgObject = {
-    type: PLAYER_ACTION_REQUEST,
-    payload: {
-      gameState: gameState.public,
-      cards: gameState.private.playerCards[ws.id],
-      action
-    }
-  };
-  const msgString = JSON.stringify(msgObject);
-  client.send(msgString);
-  console.debug(`client ${ws.id}: ${action} request sent`);
-};
-
 export const nextPlayer = (gameState) => {
   gameState.public.currentPlayer =
     gameState.public.players[
@@ -171,8 +156,11 @@ export const nextPlayer = (gameState) => {
     ].id;
 };
 
-export const handleRedOrBlackChoice = (gameState, choice, ws) => {
-  const playerId = ws.id;
+export const setPlayerStatus = (gameState, playerId, status) => {
+  gameState.public.players.find((player) => player.id === playerId).status = status;
+};
+
+export const handleRedOrBlackChoice = (gameState, choice, playerId) => {
   const drawnCard = gameState.deck.splice(Math.floor(Math.random() * gameState.private.deck.length), 1)[0];
   const playerCards = gameState.private.playerCards[playerId];
   const playerHoldsJoker = playerCards.find((card) => card.value === 'JOKER');
@@ -184,9 +172,9 @@ export const handleRedOrBlackChoice = (gameState, choice, ws) => {
         (choice === RED && (drawnCard.suit === HEARTS || drawnCard.suit === DIAMONDS)) ||
         (choice === BLACK && (drawnCard.suit === SPADES || drawnCard.suit === CLUBS))
       ) {
-        sendPlayerActionRequest(gameState, GIVE_DRINK, ws);
+        setPlayerStatus(gameState, playerId, GIVING_DRINK);
       } else {
-        sendPlayerActionRequest(gameState, TAKE_DRINK, ws);
+        setPlayerStatus(gameState, playerId, TAKING_DRINK);
       }
       break;
     case 1:
@@ -199,9 +187,9 @@ export const handleRedOrBlackChoice = (gameState, choice, ws) => {
           (choice === SAME && drawnCardValue < playerCardValue)) &&
         !playerHoldsJoker
       ) {
-        sendPlayerActionRequest(gameState, GIVE_DRINK, ws);
+        setPlayerStatus(gameState, playerId, GIVING_DRINK);
       } else {
-        sendPlayerActionRequest(gameState, TAKE_DRINK, ws);
+        setPlayerStatus(gameState, playerId, TAKING_DRINK);
       }
       break;
     case 2:
@@ -215,9 +203,9 @@ export const handleRedOrBlackChoice = (gameState, choice, ws) => {
           (choice === INBETWEEN && drawnCardValue > lowerPlayerCardValue && drawnCardValue < upperPlayerCardValue)) &&
         !playerHoldsJoker
       ) {
-        sendPlayerActionRequest(gameState, GIVE_DRINK, ws);
+        setPlayerStatus(gameState, playerId, GIVING_DRINK);
       } else {
-        sendPlayerActionRequest(gameState, TAKE_DRINK, ws);
+        setPlayerStatus(gameState, playerId, TAKING_DRINK);
       }
       break;
     case 3:
@@ -228,16 +216,16 @@ export const handleRedOrBlackChoice = (gameState, choice, ws) => {
         (choice === DIAMONDS && drawnCard.suit === DIAMONDS) ||
         (choice === HEARTS && drawnCard.suit === HEARTS)
       ) {
-        sendPlayerActionRequest(gameState, GIVE_DRINK, ws);
+        setPlayerStatus(gameState, playerId, GIVING_DRINK);
       } else {
-        sendPlayerActionRequest(gameState, TAKE_DRINK, ws);
+        setPlayerStatus(gameState, playerId, TAKING_DRINK);
       }
       break;
     case 4:
       if (drawnCard.value === choice.value && drawnCard.suit === choice.suit) {
-        sendPlayerActionRequest(gameState, GIVE_DRINK, ws);
+        setPlayerStatus(gameState, playerId, GIVING_DRINK);
       } else {
-        sendPlayerActionRequest(gameState, TAKE_DRINK, ws);
+        setPlayerStatus(gameState, playerId, TAKING_DRINK);
       }
       break;
     default:

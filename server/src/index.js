@@ -5,7 +5,7 @@ import readline from 'readline';
 import WebSocket from 'ws';
 import { EXIT, HELP, REMOVE_PLAYER, RESTART, SET_DECKS, SKIP, UPDATE } from './constants/commands.js';
 import { PLAYER_ACTION_RESPONSE, PLAYER_INIT, SERVER_ERROR } from './constants/messages.js';
-import { CHOOSE, FUCK_YOU, RED_OR_BLACK, WAITING_FOR_PLAYER } from './constants/statuses.js';
+import { CHOOSE, CONTINUE, FUCK_YOU, RED_OR_BLACK, WAITING, WAITING_FOR_PLAYER } from './constants/statuses.js';
 import {
   broadcastGameState,
   handleRedOrBlackChoice,
@@ -15,6 +15,7 @@ import {
   removePlayer,
   restartGame,
   sendPlayerActionRequest,
+  setPlayerStatus,
   updateCurrentGame
 } from './game.js';
 
@@ -93,21 +94,17 @@ wss.on('connection', (ws) => {
         console.debug(`client ${ws.id}: player initialised with name ${ws.name}`);
         broadcastGameState(gameState, clients);
         break;
-      case PLAYER_ACTION_RESPONSE:
-        if (ws.id !== gameState.public.currentPlayer) break;
-
+      case PLAYER_ACTION:
         switch (gameState.public.game) {
           case RED_OR_BLACK:
-            if (req.payload.choice) {
-              handleRedOrBlackChoice(gameState, choice, ws);
-            } else {
+            if (ws.id !== gameState.public.currentPlayer) break;
+            if (req.payload.action === CHOOSE) {
+              handleRedOrBlackChoice(gameState, req.payload.choice, ws.id);
+            } else if (req.payload.action === CONTINUE) {
+              setPlayerStatus(gameState, gameState.public.currentPlayer, null);
               nextPlayer(gameState);
+              setPlayerStatus(gameState, gameState.public.currentPlayer, CHOOSE);
               updateCurrentGame(gameState);
-              sendPlayerActionRequest(
-                gameState,
-                CHOOSE,
-                clients.find((client) => client.id === gameState.public.currentPlayer)
-              );
             }
             break;
           case FUCK_YOU:
