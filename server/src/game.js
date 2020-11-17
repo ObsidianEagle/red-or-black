@@ -1,4 +1,4 @@
-import { RED_OR_BLACK } from './constants/games';
+import { GAME_STATE, PLAYER_INIT_ACK } from './constants/messages.js';
 import {
   BLACK,
   CLUBS,
@@ -9,11 +9,12 @@ import {
   INBETWEEN,
   LOWER,
   RED,
+  RED_OR_BLACK,
   RIDE_THE_BUS,
   SAME,
   SPADES,
   TAKE_DRINK
-} from './constants/statuses';
+} from './constants/statuses.js';
 
 export const populateDeck = (numberOfDecks) => {
   const suits = [HEARTS, SPADES, CLUBS, DIAMONDS];
@@ -104,9 +105,9 @@ export const restartGame = (gameState, numberOfDecks) => {
 };
 
 export const updateCurrentGame = (gameState) => {
+  const playerIds = gameState.public.players.map((player) => player.id);
   switch (gameState.public.game) {
     case RED_OR_BLACK:
-      const playerIds = gameState.public.players.map((player) => player.id);
       const fullHands = playerIds.filter((id) => gameState.private.playerCards[id].length === 5);
       if (fullHands.length === playerIds.length) {
         gameState.public.game = FUCK_YOU;
@@ -115,7 +116,6 @@ export const updateCurrentGame = (gameState) => {
       }
       break;
     case FUCK_YOU:
-      const playerIds = gameState.public.players.map((player) => player.id);
       const nonEmptyHands = playerIds.filter((id) => gameState.private.playerCards[id].length > 0);
       if (nonEmptyHands.length === 1) {
         gameState.public.game = RIDE_THE_BUS;
@@ -162,6 +162,7 @@ export const setPlayerStatus = (gameState, playerId, status) => {
 
 export const handleRedOrBlackChoice = (gameState, choice, playerId) => {
   const drawnCard = gameState.deck.splice(Math.floor(Math.random() * gameState.private.deck.length), 1)[0];
+  const drawnCardValue = cardValueToNumericalValue(drawnCard.value);
   const playerCards = gameState.private.playerCards[playerId];
   const playerHoldsJoker = playerCards.find((card) => card.value === 'JOKER');
 
@@ -178,7 +179,6 @@ export const handleRedOrBlackChoice = (gameState, choice, playerId) => {
       }
       break;
     case 1:
-      const drawnCardValue = cardValueToNumericalValue(drawnCard.value);
       const playerCardValue = cardValueToNumericalValue(playerCards[0].value);
       gameState.private.playerCards[playerId].push(drawnCard);
       if (
@@ -193,7 +193,6 @@ export const handleRedOrBlackChoice = (gameState, choice, playerId) => {
       }
       break;
     case 2:
-      const drawnCardValue = cardValueToNumericalValue(drawnCard.value);
       const sortedPlayerCardValues = playerCards.map((card) => cardValueToNumericalValue(card.value)).sort();
       const lowerPlayerCardValue = sortedPlayerCardValues[0];
       const upperPlayerCardValue = sortedPlayerCardValues[1];

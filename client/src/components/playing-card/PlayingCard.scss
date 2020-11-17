@@ -1,0 +1,21 @@
+@import '../../styles/global';
+
+.playing-card {
+  height: 14vh;
+  width: 10vh;
+
+  @media (max-width: $mobile-max-width) {
+    height: 10.5vh;
+    width: 7.5vh;
+  }
+
+  &-large {
+    height: 35vh;
+    width: 25vh;
+
+    @media (max-width: $mobile-max-width) {
+      height: 21vh;
+      width: 15vh;
+    }
+  }
+}

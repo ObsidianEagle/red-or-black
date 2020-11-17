@@ -1,4 +1,4 @@
-import { } from 'dotenv/config.js';
+import {} from 'dotenv/config.js';
 import fs from 'fs';
 import https from 'https';
 import readline from 'readline';
@@ -123,7 +123,7 @@ wss.on('connection', (ws) => {
     removePlayer(gameState, ws, clients);
     console.debug(`client ${ws.id}: connection closed, removed from game`);
 
-    if (!gameState.players.length) {
+    if (!gameState.public.players.length) {
       restartGame(gameState, numberOfDecks);
       idCounter = 1;
       console.debug(`no players remaining, game state reset`);
