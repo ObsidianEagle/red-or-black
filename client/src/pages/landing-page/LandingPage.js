@@ -57,7 +57,7 @@ const LandingPage = ({ setPlayerId, setGameState, setWs }) => {
 
   return (
     <Container textAlign="center" className="landing-page">
-      <Header className="main-header">Red or Black</Header>
+      <Header className="main-header">Red <span style={{ color: '#77281A' }}>or</span> <span style={{ color: 'black' }}>Black</span></Header>
       <Input
         label="Your Name"
         value={name}

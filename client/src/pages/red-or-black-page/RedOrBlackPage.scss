@@ -1,0 +1,11 @@
+@import '../../styles/global';
+
+.ui.red-or-black-grid {
+  margin: 2em 2em auto;
+
+  .continue-button {
+    margin-top: 2em;
+    background-color: $primary-colour;
+    color: #FFFFFF;
+  }
+}

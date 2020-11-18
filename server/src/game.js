@@ -1,13 +1,16 @@
 import { GAME_STATE, PLAYER_INIT_ACK } from './constants/messages.js';
 import {
   BLACK,
+  CHOOSE,
   CLUBS,
   DIAMONDS,
   FUCK_YOU,
   GIVE_DRINK,
   HEARTS,
+  HIGHER,
   INBETWEEN,
   LOWER,
+  OUTSIDE,
   RED,
   RED_OR_BLACK,
   RIDE_THE_BUS,
@@ -43,7 +46,10 @@ export const initialisePlayer = (playerInitRequest, gameState, ws) => {
     status: null
   });
   gameState.private.playerCards[id] = [];
-  if (!gameState.public.currentPlayer) gameState.public.currentPlayer = id;
+  if (!gameState.public.currentPlayer) {
+    gameState.public.currentPlayer = id;
+    gameState.public.players.find((player) => player.id === id).status = CHOOSE;
+  }
   const playerInitAck = {
     type: PLAYER_INIT_ACK,
     payload: { id, gameState: gameState.public }
@@ -149,10 +155,10 @@ export const cardValueToNumericalValue = (cardValue) => {
   return numericalValues[cardValue];
 };
 
-export const nextPlayer = (gameState) => {
+export const nextPlayer = (gameState, playerId) => {
   gameState.public.currentPlayer =
     gameState.public.players[
-      (gameState.players.findIndex((player) => player.id === ws.id) + 1) % gameState.players.length
+      (gameState.public.players.findIndex((player) => player.id === playerId) + 1) % gameState.public.players.length
     ].id;
 };
 
@@ -161,7 +167,7 @@ export const setPlayerStatus = (gameState, playerId, status) => {
 };
 
 export const handleRedOrBlackChoice = (gameState, choice, playerId) => {
-  const drawnCard = gameState.deck.splice(Math.floor(Math.random() * gameState.private.deck.length), 1)[0];
+  const drawnCard = gameState.private.deck.splice(Math.floor(Math.random() * gameState.private.deck.length), 1)[0];
   const drawnCardValue = cardValueToNumericalValue(drawnCard.value);
   const playerCards = gameState.private.playerCards[playerId];
   const playerHoldsJoker = playerCards.find((card) => card.value === 'JOKER');
@@ -221,6 +227,7 @@ export const handleRedOrBlackChoice = (gameState, choice, playerId) => {
       }
       break;
     case 4:
+      gameState.private.playerCards[playerId].push(drawnCard);
       if (drawnCard.value === choice.value && drawnCard.suit === choice.suit) {
         setPlayerStatus(gameState, playerId, GIVE_DRINK);
       } else {

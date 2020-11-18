@@ -1,0 +1,11 @@
+.ui.player-hand {
+  .player-hand-cards {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+
+    .player-hand-card {
+      margin: 0.5em;
+    }
+  }
+}
