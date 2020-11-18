@@ -8,6 +8,7 @@ export const TAKE_DRINK = 'TAKE_DRINK';
 export const GIVE_DRINK = 'GIVE_DRINK';
 export const CHOOSE = 'CHOOSE';
 export const CONTINUE = 'CONTINUE';
+export const FUCK = 'FUCK';
 
 // CHOICES
 export const HEARTS = 'HEARTS';

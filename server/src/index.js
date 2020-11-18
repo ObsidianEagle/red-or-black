@@ -5,9 +5,10 @@ import readline from 'readline';
 import WebSocket from 'ws';
 import { EXIT, HELP, REMOVE_PLAYER, RESTART, SET_DECKS, SKIP, UPDATE } from './constants/commands.js';
 import { PLAYER_ACTION, PLAYER_INIT, SERVER_ERROR } from './constants/messages.js';
-import { CHOOSE, CONTINUE, FUCK_YOU, RED_OR_BLACK } from './constants/statuses.js';
+import { CHOOSE, CONTINUE, FUCK_YOU, RED_OR_BLACK, TAKE_DRINK } from './constants/statuses.js';
 import {
   broadcastGameState,
+  handleFuck,
   handleRedOrBlackChoice,
   initialisePlayer,
   nextPlayer,
@@ -58,11 +59,15 @@ const gameState = {
   public: {
     players: [],
     game: RED_OR_BLACK,
-    currentPlayer: null
+    prevPlayer: null,
+    currentPlayer: null,
+    fuckCards: [],
+    countdown: null
   },
   private: {
     playerCards: {},
-    deck: populateDeck(numberOfDecks)
+    deck: populateDeck(numberOfDecks),
+    countdownCallback: null
   }
 };
 
@@ -103,15 +108,19 @@ wss.on('connection', (ws) => {
               setPlayerStatus(gameState, gameState.public.currentPlayer, null);
               nextPlayer(gameState, ws.id);
               setPlayerStatus(gameState, gameState.public.currentPlayer, CHOOSE);
-              updateCurrentGame(gameState);
             }
             break;
           case FUCK_YOU:
-            // TODO
+            if (req.payload.action === FUCK) {
+              if (gameState.public.players.find((player) => player.id === ws.id).status === TAKE_DRINK)
+                gameState.public.fuckCards = [];
+              handleFuck(gameState, req.payload.card, req.payload.target, ws.id, clients);
+            }
             break;
           default:
             break;
         }
+        updateCurrentGame(gameState);
         broadcastGameState(gameState, clients);
         break;
       default:

@@ -4,6 +4,7 @@ import {
   CHOOSE,
   CLUBS,
   DIAMONDS,
+  FUCK,
   FUCK_YOU,
   GIVE_DRINK,
   HEARTS,
@@ -43,7 +44,8 @@ export const initialisePlayer = (playerInitRequest, gameState, ws) => {
   gameState.public.players.push({
     name,
     id,
-    status: null
+    status: null,
+    cardCount: 0
   });
   gameState.private.playerCards[id] = [];
   if (!gameState.public.currentPlayer) {
@@ -118,14 +120,15 @@ export const updateCurrentGame = (gameState) => {
       if (fullHands.length === playerIds.length) {
         gameState.public.game = FUCK_YOU;
         gameState.public.currentPlayer = gameState.public.players[0].id;
+        gameState.public.countdown = 10;
         return FUCK_YOU;
       }
       break;
     case FUCK_YOU:
-      const nonEmptyHands = playerIds.filter((id) => gameState.private.playerCards[id].length > 0);
-      if (nonEmptyHands.length === 1) {
+      const playersWithCards = gameState.public.players.find((player) => player.cardCount > 0);
+      if (playersWithCards.length === 1) {
         gameState.public.game = RIDE_THE_BUS;
-        gameState.public.currentPlayer = nonEmptyHands[0];
+        gameState.public.currentPlayer = playersWithCards[0].id;
         gameState.private.deck = populateDeck(1);
         return RIDE_THE_BUS;
       }
@@ -171,6 +174,7 @@ export const handleRedOrBlackChoice = (gameState, choice, playerId) => {
   const drawnCardValue = cardValueToNumericalValue(drawnCard.value);
   const playerCards = gameState.private.playerCards[playerId];
   const playerHoldsJoker = playerCards.find((card) => card.value === 'JOKER');
+  gameState.public.players.find((player) => player.id === playerId).cardCount++;
 
   switch (gameState.private.playerCards[playerId].length) {
     case 0:
@@ -238,3 +242,42 @@ export const handleRedOrBlackChoice = (gameState, choice, playerId) => {
       break;
   }
 };
+
+export const handleFuck = (gameState, card, target, playerId, clients) => {
+  // TODO: skip countdown if no possible cards left to play
+  gameState.public.countdown = 15;
+  if (gameState.private.countdownCallback) clearInterval(gameState.private.countdownCallback);
+  gameState.private.countdownCallback = beginCountdownTimer(gameState, clients);
+  gameState.public.currentPlayer = target;
+  gameState.public.prevPlayer = playerId;
+  gameState.public.players.forEach((player) => player.status === null);
+  gameState.public.players.find((player) => player.id === target).status = FUCK;
+  gameState.private.playerCards[playerId].splice(
+    gameState.private.playerCards[playerId].findIndex(
+      (playerCard) => playerCard.suit === card.suit && playerCard.value === card.value
+    ),
+    1
+  );
+  gameState.public.players.find((player) => player.id === playerId).cardCount =
+    gameState.private.playerCards[playerId].length;
+};
+
+export const settleFucked = (gameState, clients) => {
+  gameState.public.countdown = null;
+  clearInterval(gameState.private.countdownCallback);
+  gameState.public.players.forEach((player) => player.status === null);
+  setPlayerStatus(gameState, gameState.public.currentPlayer, TAKE_DRINK);
+  broadcastGameState(gameState, clients);
+};
+
+export const beginCountdownTimer = (gameState, clients) =>
+  setInterval(() => {
+    const { countdown } = gameState.public;
+    if (countdown === null) {
+      return;
+    } else if (countdown > 0) {
+      countdown--;
+    } else {
+      settleFucked(gameState, clients);
+    }
+  }, 15000);

@@ -52,9 +52,10 @@ import { ReactComponent as CA } from './AC.svg';
 import { ReactComponent as DA } from './AD.svg';
 import { ReactComponent as HA } from './AH.svg';
 import { ReactComponent as SA } from './AS.svg';
+import { ReactComponent as JOKER } from './JOKER.svg';
 
 const cards = {
-  B1, B2,
+  B1, B2, JOKER,
   C2, C3, C4, C5, C6, C7, C8, C9, C10, CJ, CQ, CK, CA,
   D2, D3, D4, D5, D6, D7, D8, D9, D10, DJ, DQ, DK, DA,
   H2, H3, H4, H5, H6, H7, H8, H9, H10, HJ, HQ, HK, HA,
