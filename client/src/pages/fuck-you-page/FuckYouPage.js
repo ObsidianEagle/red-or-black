@@ -2,10 +2,11 @@ import { useEffect, useState } from 'react';
 import { Grid } from 'semantic-ui-react';
 import CardsView from '../../components/cards-view/CardsView';
 import FuckHand from '../../components/fuck-hand/FuckHand';
+import FuckYouActionArea from '../../components/fuck-you-action-area/FuckYouActionArea';
 import PlayerChoiceModal from '../../components/player-choice-modal/PlayerChoiceModal';
 import PlayerList from '../../components/player-list/PlayerList';
 import { GAME_STATE, PLAYER_ACTION, TIMEOUT_WARNING } from '../../constants/messages';
-import { CHOOSE, FUCK, START, TAKE_DRINK } from '../../constants/statuses';
+import { CHOOSE, CONTINUE, FUCK, START, TAKE_DRINK } from '../../constants/statuses';
 import './FuckYouPage.scss';
 
 const FuckYouPage = ({ playerId, gameState, ws, setGameState, playerCards, setPlayerCards }) => {
@@ -66,6 +67,17 @@ const FuckYouPage = ({ playerId, gameState, ws, setGameState, playerCards, setPl
 
   if (!gameState || !playerCards) return null;
 
+  const sendContinue = () => {
+    const msgObject = {
+      type: PLAYER_ACTION,
+      payload: {
+        action: CONTINUE
+      }
+    };
+    const msgString = JSON.stringify(msgObject);
+    ws.send(msgString);
+  };
+
   const { players, fuckCards, prevPlayer, countdown } = gameState;
   const playerStatus = players.find((player) => player.id === playerId).status;
 
@@ -82,16 +94,12 @@ const FuckYouPage = ({ playerId, gameState, ws, setGameState, playerCards, setPl
       <Grid columns={2} stackable className="red-or-black-grid">
         <Grid.Column width={10} textAlign="center">
           <CardsView cards={fuckCards} />
-          {/* TODO: refactor status into component */}
-          {playerStatus === FUCK ? (
-            <h2>
-              You've been fucked by {findPlayerName(prevPlayer)}! Fuck someone else or wait for the timer to run out.
-            </h2>
-          ) : null}
-          {playerStatus === TAKE_DRINK ? (
-            <h2>You've been fucked by {findPlayerName(prevPlayer)}! Drink, then choose someone to fuck.</h2>
-          ) : null}
-          {playerStatus === START ? <h2>Choose someone to fuck.</h2> : null}
+          <FuckYouActionArea
+            players={players}
+            playerStatus={playerStatus}
+            sendContinue={sendContinue}
+            prevPlayerName={findPlayerName(prevPlayer)}
+          />
           <FuckHand
             cards={playerCards}
             fuckCards={fuckCards}

@@ -116,6 +116,8 @@ wss.on('connection', (ws) => {
               if (gameState.public.players.find((player) => player.id === ws.id).status === TAKE_DRINK)
                 gameState.public.fuckCards = [];
               handleFuck(gameState, req.payload.choice.card, req.payload.choice.target, ws.id, clients);
+            } else if (req.payload.action === CONTINUE) {
+              // TODO, continue to RtB
             }
             break;
           default:

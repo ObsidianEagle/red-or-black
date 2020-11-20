@@ -8,7 +8,7 @@ const PlayerChoiceModal = ({ isOpen, thisPlayerId, players, setTarget }) => {
 
   return (
     <Modal open={isOpen} className="player-choice-modal">
-      <Modal.Header className="modal-header">Choose a player to fuck</Modal.Header>
+      <Modal.Header className="modal-header">Choose a player</Modal.Header>
       <Modal.Content>
         <Container textAlign="center">
           {availablePlayers.map((player) => (
