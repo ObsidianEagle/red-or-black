@@ -6,7 +6,7 @@ import FuckYouActionArea from '../../components/fuck-you-action-area/FuckYouActi
 import PlayerChoiceModal from '../../components/player-choice-modal/PlayerChoiceModal';
 import PlayerList from '../../components/player-list/PlayerList';
 import { GAME_STATE, PLAYER_ACTION, TIMEOUT_WARNING } from '../../constants/messages';
-import { CHOOSE, CONTINUE, FUCK, START, TAKE_DRINK } from '../../constants/statuses';
+import { CHOOSE, CONTINUE, START, TAKE_DRINK } from '../../constants/statuses';
 import './FuckYouPage.scss';
 
 const FuckYouPage = ({ playerId, gameState, ws, setGameState, playerCards, setPlayerCards }) => {
@@ -98,7 +98,7 @@ const FuckYouPage = ({ playerId, gameState, ws, setGameState, playerCards, setPl
             players={players}
             playerStatus={playerStatus}
             sendContinue={sendContinue}
-            prevPlayerName={findPlayerName(prevPlayer)}
+            prevPlayerName={prevPlayer ? findPlayerName(prevPlayer) : undefined}
           />
           <FuckHand
             cards={playerCards}
