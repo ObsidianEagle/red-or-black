@@ -1,22 +1,23 @@
 import { useState } from 'react';
 import './App.scss';
 import { FUCK_YOU, RED_OR_BLACK, RIDE_THE_BUS } from './constants/statuses';
+import FuckYouPage from './pages/fuck-you-page/FuckYouPage';
 import LandingPage from './pages/landing-page/LandingPage';
 import RedOrBlackPage from './pages/red-or-black-page/RedOrBlackPage';
 
 const App = () => {
   const [playerId, setPlayerId] = useState(null);
   const [gameState, setGameState] = useState(null);
+  const [playerCards, setPlayerCards] = useState(null);
   const [ws, setWs] = useState(null);
 
   const displayGameView = () => {
-    const gameViewParams = { playerId, gameState, ws, setGameState };
+    const gameViewParams = { playerId, gameState, ws, setGameState, playerCards, setPlayerCards };
     switch (gameState.game) {
       case RED_OR_BLACK:
-        return <RedOrBlackPage {...gameViewParams} />
+        return <RedOrBlackPage {...gameViewParams} />;
       case FUCK_YOU:
-        // TODO
-        return null;
+        return <FuckYouPage {...gameViewParams} />;
       case RIDE_THE_BUS:
         // TODO
         return null;

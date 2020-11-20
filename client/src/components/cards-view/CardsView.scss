@@ -1,0 +1,11 @@
+.ui.cards-view {
+  .cards-view-cards {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+
+    .cards-view-card {
+      margin: 0.5em;
+    }
+  }
+}

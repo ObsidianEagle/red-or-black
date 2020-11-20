@@ -108,19 +108,19 @@ wss.on('connection', (ws) => {
               setPlayerStatus(gameState, gameState.public.currentPlayer, null);
               nextPlayer(gameState, ws.id);
               setPlayerStatus(gameState, gameState.public.currentPlayer, CHOOSE);
+              updateCurrentGame(gameState);
             }
             break;
           case FUCK_YOU:
-            if (req.payload.action === FUCK) {
+            if (req.payload.action === CHOOSE) {
               if (gameState.public.players.find((player) => player.id === ws.id).status === TAKE_DRINK)
                 gameState.public.fuckCards = [];
-              handleFuck(gameState, req.payload.card, req.payload.target, ws.id, clients);
+              handleFuck(gameState, req.payload.choice.card, req.payload.choice.target, ws.id, clients);
             }
             break;
           default:
             break;
         }
-        updateCurrentGame(gameState);
         broadcastGameState(gameState, clients);
         break;
       default:

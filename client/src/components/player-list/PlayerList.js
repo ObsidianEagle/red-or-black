@@ -1,7 +1,7 @@
 import { Table } from 'semantic-ui-react';
-import { CHOOSE, GIVE_DRINK, TAKE_DRINK } from '../../constants/statuses';
+import { CHOOSE, FUCK, GIVE_DRINK, START, TAKE_DRINK } from '../../constants/statuses';
 
-const statusText = (status) => {
+const statusText = (status, prevPlayerName) => {
   switch (status) {
     case CHOOSE:
       return 'Choosing...';
@@ -9,12 +9,16 @@ const statusText = (status) => {
       return 'Drinking...';
     case GIVE_DRINK:
       return 'Giving out drinks...';
+    case FUCK:
+      return `Fucked by ${prevPlayerName}...`;
+    case START:
+      return 'Waiting to start...';
     default:
       return '';
   }
 };
 
-const PlayerList = ({ thisPlayerId, players }) => (
+const PlayerList = ({ thisPlayerId, players, prevPlayerName }) => (
   <Table celled unstackable>
     <Table.Header>
       <Table.Row>
@@ -29,7 +33,7 @@ const PlayerList = ({ thisPlayerId, players }) => (
             {player.name}
             {player.id === thisPlayerId ? ' (you)' : null}
           </Table.Cell>
-          <Table.Cell>{statusText(player.status)}</Table.Cell>
+          <Table.Cell>{statusText(player.status, prevPlayerName)}</Table.Cell>
         </Table.Row>
       ))}
     </Table.Body>

@@ -17,6 +17,7 @@ import {
   RIDE_THE_BUS,
   SAME,
   SPADES,
+  START,
   TAKE_DRINK
 } from './constants/statuses.js';
 
@@ -104,11 +105,15 @@ export const restartGame = (gameState, numberOfDecks) => {
   gameState.public = {
     players: [],
     game: RED_OR_BLACK,
-    currentPlayer: null
+    prevPlayer: null,
+    currentPlayer: null,
+    fuckCards: [],
+    countdown: null
   };
   gameState.private = {
     playerCards: {},
-    deck: populateDeck(numberOfDecks)
+    deck: populateDeck(numberOfDecks),
+    countdownCallback: null
   };
 };
 
@@ -120,7 +125,8 @@ export const updateCurrentGame = (gameState) => {
       if (fullHands.length === playerIds.length) {
         gameState.public.game = FUCK_YOU;
         gameState.public.currentPlayer = gameState.public.players[0].id;
-        gameState.public.countdown = 10;
+        gameState.public.players[0].status = START;
+        gameState.public.countdown = 15;
         return FUCK_YOU;
       }
       break;
@@ -250,8 +256,9 @@ export const handleFuck = (gameState, card, target, playerId, clients) => {
   gameState.private.countdownCallback = beginCountdownTimer(gameState, clients);
   gameState.public.currentPlayer = target;
   gameState.public.prevPlayer = playerId;
-  gameState.public.players.forEach((player) => player.status === null);
+  gameState.public.players.forEach((player) => (player.status = null));
   gameState.public.players.find((player) => player.id === target).status = FUCK;
+  gameState.public.fuckCards.push(card);
   gameState.private.playerCards[playerId].splice(
     gameState.private.playerCards[playerId].findIndex(
       (playerCard) => playerCard.suit === card.suit && playerCard.value === card.value
@@ -272,12 +279,12 @@ export const settleFucked = (gameState, clients) => {
 
 export const beginCountdownTimer = (gameState, clients) =>
   setInterval(() => {
-    const { countdown } = gameState.public;
-    if (countdown === null) {
+    if (gameState.public.countdown === null || !clients.length) {
       return;
-    } else if (countdown > 0) {
-      countdown--;
+    } else if (gameState.public.countdown > 0) {
+      gameState.public.countdown -= 1;
+      broadcastGameState(gameState, clients);
     } else {
       settleFucked(gameState, clients);
     }
-  }, 15000);
+  }, 1000);

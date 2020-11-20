@@ -1,15 +1,13 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { Button, Grid } from 'semantic-ui-react';
+import CardsView from '../../components/cards-view/CardsView';
 import ChoiceModal from '../../components/choice-modal/ChoiceModal';
-import PlayerHand from '../../components/player-hand/PlayerHand';
 import PlayerList from '../../components/player-list/PlayerList';
 import { GAME_STATE, PLAYER_ACTION, TIMEOUT_WARNING } from '../../constants/messages';
 import { CHOOSE, CONTINUE, GIVE_DRINK, TAKE_DRINK } from '../../constants/statuses';
 import './RedOrBlackPage.scss';
 
-const RedOrBlackPage = ({ playerId, gameState, ws, setGameState }) => {
-  const [playerCards, setPlayerCards] = useState(null);
-
+const RedOrBlackPage = ({ playerId, gameState, ws, setGameState, playerCards, setPlayerCards }) => {
   useEffect(() => {
     ws.onmessage = (e) => {
       const msg = JSON.parse(e.data);
@@ -31,7 +29,7 @@ const RedOrBlackPage = ({ playerId, gameState, ws, setGameState }) => {
       console.log('Game connection closed by server');
       setTimeout(window.location.reload.bind(window.location), 2000);
     };
-  }, [setGameState, ws]);
+  }, [setGameState, ws, setPlayerCards]);
 
   useEffect(() => {
     console.debug({ gameState, cards: playerCards });
@@ -71,7 +69,8 @@ const RedOrBlackPage = ({ playerId, gameState, ws, setGameState }) => {
       <ChoiceModal isOpen={playerStatus === CHOOSE} playerCards={playerCards} sendChoice={sendChoice} />
       <Grid columns={2} stackable className="red-or-black-grid">
         <Grid.Column width={10} textAlign="center">
-          <PlayerHand cards={playerCards} />
+          <h3>Your Cards</h3>
+          <CardsView cards={playerCards} />
           {playerStatus === TAKE_DRINK || playerStatus === GIVE_DRINK ? (
             <>
               <h2>{playerStatus === TAKE_DRINK ? 'Wrong! Drink.' : 'Correct! Give out some drinks.'}</h2>
