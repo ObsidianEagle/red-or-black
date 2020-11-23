@@ -209,7 +209,9 @@ export const handleRedOrBlackChoice = (gameState, choice, playerId) => {
       }
       break;
     case 2:
-      const sortedPlayerCardValues = playerCards.map((card) => cardValueToNumericalValue(card.value)).sort();
+      const sortedPlayerCardValues = playerCards
+        .map((card) => cardValueToNumericalValue(card.value))
+        .sort((a, b) => a - b);
       const lowerPlayerCardValue = sortedPlayerCardValues[0];
       const upperPlayerCardValue = sortedPlayerCardValues[1];
       gameState.private.playerCards[playerId].push(drawnCard);
