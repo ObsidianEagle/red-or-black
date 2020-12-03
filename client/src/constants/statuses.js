@@ -10,6 +10,7 @@ export const CHOOSE = 'CHOOSE';
 export const CONTINUE = 'CONTINUE';
 export const FUCK = 'FUCK';
 export const START = 'START';
+export const END = 'END';
 
 // CHOICES
 export const HEARTS = 'HEARTS';

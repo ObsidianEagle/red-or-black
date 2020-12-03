@@ -3,7 +3,9 @@ import {
   BLACK,
   CHOOSE,
   CLUBS,
+  CONTINUE,
   DIAMONDS,
+  END,
   FUCK,
   FUCK_YOU,
   GIVE_DRINK,
@@ -108,12 +110,14 @@ export const restartGame = (gameState, numberOfDecks) => {
     prevPlayer: null,
     currentPlayer: null,
     fuckCards: [],
-    countdown: null
+    countdown: null,
+    bus: []
   };
   gameState.private = {
     playerCards: {},
     deck: populateDeck(numberOfDecks),
-    countdownCallback: null
+    countdownCallback: null,
+    bus: []
   };
 };
 
@@ -290,3 +294,49 @@ export const beginCountdownTimer = (gameState, clients) =>
       settleFucked(gameState, clients);
     }
   }, 1000);
+
+export const populateBus = (gameState) => {
+  const newDeck = populateDeck(1);
+  for (let i = newDeck.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [newDeck[i], newDeck[j]] = [newDeck[j], newDeck[i]];
+  }
+  gameState.private.deck = newDeck;
+
+  gameState.private.bus = [
+    [newDeck.splice(0, 1)],
+    [newDeck.splice(0, 2)],
+    [newDeck.splice(0, 3)],
+    [newDeck.splice(0, 4)],
+    [newDeck.splice(0, 3)],
+    [newDeck.splice(0, 2)],
+    [newDeck.splice(0, 1)]
+  ];
+  gameState.public.bus = [
+    gameState.private.bus[0],
+    Array(2).fill(null),
+    Array(3).fill(null),
+    Array(4).fill(null),
+    Array(3).fill(null),
+    Array(2).fill(null),
+    Array(1).fill(null)
+  ];
+};
+
+export const handleRideTheBusChoice = (gameState, { cardPos: { row, col }, guess }) => {
+  const prevCardValue = cardValueToNumericalValue(gameState.public.bus.cards[row - 1].find((card) => card));
+  const chosenCardValue = cardValueToNumericalValue(gameState.private.bus.cards[row][col]);
+
+  if (chosenCardValue === -1) {
+    gameState.public.players.find((player) => player.id === gameState.public.currentPlayer).status = CHOOSE;
+  } else if (
+    (guess === HIGHER && chosenCardValue > prevCardValue) ||
+    (guess === LOWER && chosenCardValue < prevCardValue) ||
+    (guess === SAME && chosenCardValue === prevCardValue)
+  ) {
+    gameState.public.players.find((player) => player.id === gameState.public.currentPlayer).status =
+      row === gameState.public.bus.cards.length - 1 ? END : CONTINUE;
+  } else {
+    gameState.public.players.find((player) => player.id === gameState.public.currentPlayer).status = TAKE_DRINK;
+  }
+};

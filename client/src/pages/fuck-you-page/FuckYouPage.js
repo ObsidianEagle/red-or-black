@@ -105,6 +105,7 @@ const FuckYouPage = ({ playerId, gameState, ws, setGameState, playerCards, setPl
             fuckCards={fuckCards}
             setFuckCard={setFuckCard}
             openChoice={playerStatus === TAKE_DRINK || playerStatus === START}
+            handDisabled={players.filter(player => player.cardCount > 0).length === 1}
           />
         </Grid.Column>
         <Grid.Column width={6}>

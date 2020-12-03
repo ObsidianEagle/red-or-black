@@ -5,13 +5,15 @@ import readline from 'readline';
 import WebSocket from 'ws';
 import { EXIT, HELP, REMOVE_PLAYER, RESTART, SET_DECKS, SKIP, UPDATE } from './constants/commands.js';
 import { PLAYER_ACTION, PLAYER_INIT, SERVER_ERROR } from './constants/messages.js';
-import { CHOOSE, CONTINUE, FUCK_YOU, RED_OR_BLACK, TAKE_DRINK } from './constants/statuses.js';
+import { CHOOSE, CONTINUE, FUCK_YOU, RED_OR_BLACK, RIDE_THE_BUS, TAKE_DRINK } from './constants/statuses.js';
 import {
   broadcastGameState,
   handleFuck,
   handleRedOrBlackChoice,
+  handleRideTheBusChoice,
   initialisePlayer,
   nextPlayer,
+  populateBus,
   populateDeck,
   removePlayer,
   restartGame,
@@ -62,12 +64,14 @@ const gameState = {
     prevPlayer: null,
     currentPlayer: null,
     fuckCards: [],
-    countdown: null
+    countdown: null,
+    bus: []
   },
   private: {
     playerCards: {},
     deck: populateDeck(numberOfDecks),
-    countdownCallback: null
+    countdownCallback: null,
+    bus: []
   }
 };
 
@@ -104,11 +108,13 @@ wss.on('connection', (ws) => {
             if (ws.id !== gameState.public.currentPlayer) break;
             if (req.payload.action === CHOOSE) {
               handleRedOrBlackChoice(gameState, req.payload.choice, ws.id);
+              console.debug(`client ${ws.id}: choice ${JSON.stringify(req.payload.choice)} handled`);
             } else if (req.payload.action === CONTINUE) {
               setPlayerStatus(gameState, gameState.public.currentPlayer, null);
               nextPlayer(gameState, ws.id);
               setPlayerStatus(gameState, gameState.public.currentPlayer, CHOOSE);
               updateCurrentGame(gameState);
+              console.debug(`client ${ws.id}: turn ended`);
             }
             break;
           case FUCK_YOU:
@@ -116,10 +122,29 @@ wss.on('connection', (ws) => {
               if (gameState.public.players.find((player) => player.id === ws.id).status === TAKE_DRINK)
                 gameState.public.fuckCards = [];
               handleFuck(gameState, req.payload.choice.card, req.payload.choice.target, ws.id, clients);
+              console.debug(`client ${ws.id}: fuck handled`);
             } else if (req.payload.action === CONTINUE) {
-              // TODO, continue to RtB
+              gameState.public.game = RIDE_THE_BUS;
+              gameState.public.currentPlayer = ws.id;
+              console.log('hit', gameState.public.game);
+              populateBus(gameState);
+              console.debug(`client ${ws.id}: proceeded to ride the bus`);
             }
             break;
+          case RIDE_THE_BUS:
+            if (req.payload.action === CHOOSE) {
+              if (req.payload.choice.target) {
+                gameState.public.currentPlayer = req.payload.choice.target;
+                populateBus(gameState);
+                console.debug(`client ${ws.id}: bus transfered to player ${gameState.public.currentPlayer}`);
+              } else {
+                handleRideTheBusChoice(gameState, req.payload.choice);
+                console.debug(`client ${ws.id}: choice ${JSON.stringify(req.payload.choice)} handled`);
+              }
+            } else if (req.payload.action === CONTINUE) {
+              populateBus(gameState);
+              console.debug(`client ${ws.id}: bus refreshed`);
+            }
           default:
             break;
         }

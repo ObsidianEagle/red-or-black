@@ -2,7 +2,7 @@ import { Button, Container } from 'semantic-ui-react';
 import PlayingCard from '../playing-card/PlayingCard';
 import './FuckHand.scss';
 
-const FuckHand = ({ cards, fuckCards, setFuckCard, openChoice }) => {
+const FuckHand = ({ cards, fuckCards, handDisabled, setFuckCard, openChoice }) => {
   const isPlayable = (card) => openChoice || fuckCards.find((fc) => fc.value === card.value) !== undefined;
 
   return (
@@ -11,7 +11,7 @@ const FuckHand = ({ cards, fuckCards, setFuckCard, openChoice }) => {
         {cards.map((card) => (
           <Button
             className="fuck-hand-card"
-            disabled={!isPlayable(card)}
+            disabled={!isPlayable(card) || handDisabled}
             onClick={() => setFuckCard(card)}
             key={card.suit + card.value}
           >

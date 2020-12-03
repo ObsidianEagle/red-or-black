@@ -6,8 +6,9 @@ const FuckYouActionArea = ({ players, playerStatus, sendContinue, prevPlayerName
   let statusText = null;
   let showButton = false;
 
-  if (players.filter(player => player.cardCount > 0).length === 1) {
+  if (players.filter(player => player.cardCount > 0).length === 1 && playerStatus) {
     statusText = "You've been fucked! Get ready to ride the bus.";
+    showButton = true;
   } else if (playerStatus === FUCK) {
     statusText = `You've been fucked by ${prevPlayerName}! Fuck someone else or wait for the timer to run out.`;
   } else if (playerStatus === TAKE_DRINK) {

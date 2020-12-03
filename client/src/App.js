@@ -4,6 +4,7 @@ import { FUCK_YOU, RED_OR_BLACK, RIDE_THE_BUS } from './constants/statuses';
 import FuckYouPage from './pages/fuck-you-page/FuckYouPage';
 import LandingPage from './pages/landing-page/LandingPage';
 import RedOrBlackPage from './pages/red-or-black-page/RedOrBlackPage';
+import RideTheBusPage from './pages/ride-the-bus-page/RideTheBusPage';
 
 const App = () => {
   const [playerId, setPlayerId] = useState(null);
@@ -19,8 +20,7 @@ const App = () => {
       case FUCK_YOU:
         return <FuckYouPage {...gameViewParams} />;
       case RIDE_THE_BUS:
-        // TODO
-        return null;
+        return <RideTheBusPage {...gameViewParams} />;
       default:
         return null;
     }
