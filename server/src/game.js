@@ -312,13 +312,13 @@ export const populateBus = (gameState) => {
   gameState.private.deck = newDeck;
 
   gameState.private.bus = [
-    [newDeck.splice(0, 1)],
-    [newDeck.splice(0, 2)],
-    [newDeck.splice(0, 3)],
-    [newDeck.splice(0, 4)],
-    [newDeck.splice(0, 3)],
-    [newDeck.splice(0, 2)],
-    [newDeck.splice(0, 1)]
+    newDeck.splice(0, 1),
+    newDeck.splice(0, 2),
+    newDeck.splice(0, 3),
+    newDeck.splice(0, 4),
+    newDeck.splice(0, 3),
+    newDeck.splice(0, 2),
+    newDeck.splice(0, 1)
   ];
   gameState.public.bus = [
     gameState.private.bus[0],
@@ -332,8 +332,8 @@ export const populateBus = (gameState) => {
 };
 
 export const handleRideTheBusChoice = (gameState, { cardPos: { row, col }, guess }) => {
-  const prevCardValue = cardValueToNumericalValue(gameState.public.bus.cards[row - 1].find((card) => card));
-  const chosenCardValue = cardValueToNumericalValue(gameState.private.bus.cards[row][col]);
+  const prevCardValue = cardValueToNumericalValue(gameState.public.bus[row - 1].find((card) => card));
+  const chosenCardValue = cardValueToNumericalValue(gameState.private.bus[row][col]);
 
   if (chosenCardValue === -1) {
     gameState.public.players.find((player) => player.id === gameState.public.currentPlayer).status = CHOOSE;

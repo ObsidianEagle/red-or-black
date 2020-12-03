@@ -126,7 +126,6 @@ wss.on('connection', (ws) => {
             } else if (req.payload.action === CONTINUE) {
               gameState.public.game = RIDE_THE_BUS;
               gameState.public.currentPlayer = ws.id;
-              console.log('hit', gameState.public.game);
               populateBus(gameState);
               console.debug(`client ${ws.id}: proceeded to ride the bus`);
             }

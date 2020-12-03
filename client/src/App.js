@@ -27,7 +27,7 @@ const App = () => {
   };
 
   return (
-    <div className="App">
+    <div className="app">
       {playerId && gameState ? (
         displayGameView()
       ) : (

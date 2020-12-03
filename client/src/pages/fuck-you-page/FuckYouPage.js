@@ -6,7 +6,7 @@ import FuckYouActionArea from '../../components/fuck-you-action-area/FuckYouActi
 import PlayerChoiceModal from '../../components/player-choice-modal/PlayerChoiceModal';
 import PlayerList from '../../components/player-list/PlayerList';
 import { GAME_STATE, PLAYER_ACTION, TIMEOUT_WARNING } from '../../constants/messages';
-import { CHOOSE, CONTINUE, START, TAKE_DRINK } from '../../constants/statuses';
+import { CHOOSE, CONTINUE, FUCK_YOU, START, TAKE_DRINK } from '../../constants/statuses';
 import './FuckYouPage.scss';
 
 const FuckYouPage = ({ playerId, gameState, ws, setGameState, playerCards, setPlayerCards }) => {
@@ -15,6 +15,7 @@ const FuckYouPage = ({ playerId, gameState, ws, setGameState, playerCards, setPl
 
   useEffect(() => {
     ws.onmessage = (e) => {
+      if (gameState.game !== FUCK_YOU) return;
       const msg = JSON.parse(e.data);
       switch (msg.type) {
         case GAME_STATE:
@@ -83,6 +84,8 @@ const FuckYouPage = ({ playerId, gameState, ws, setGameState, playerCards, setPl
 
   const findPlayerName = (id) => players.find((player) => player.id === id).name;
 
+  if (gameState.game !== FUCK_YOU) return null;
+
   return (
     <>
       <PlayerChoiceModal
@@ -105,7 +108,7 @@ const FuckYouPage = ({ playerId, gameState, ws, setGameState, playerCards, setPl
             fuckCards={fuckCards}
             setFuckCard={setFuckCard}
             openChoice={playerStatus === TAKE_DRINK || playerStatus === START}
-            handDisabled={players.filter(player => player.cardCount > 0).length === 1}
+            handDisabled={players.filter((player) => player.cardCount > 0).length === 1}
           />
         </Grid.Column>
         <Grid.Column width={6}>
