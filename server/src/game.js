@@ -256,10 +256,6 @@ export const handleRedOrBlackChoice = (gameState, choice, playerId) => {
 };
 
 export const handleFuck = (gameState, card, target, playerId, clients) => {
-  // TODO: skip countdown if no possible cards left to play
-  gameState.public.countdown = 15;
-  if (gameState.private.countdownCallback) clearInterval(gameState.private.countdownCallback);
-  gameState.private.countdownCallback = beginCountdownTimer(gameState, clients);
   gameState.public.currentPlayer = target;
   gameState.public.prevPlayer = playerId;
   gameState.public.players.forEach((player) => (player.status = null));
@@ -273,6 +269,18 @@ export const handleFuck = (gameState, card, target, playerId, clients) => {
   );
   gameState.public.players.find((player) => player.id === playerId).cardCount =
     gameState.private.playerCards[playerId].length;
+
+  if (
+    !Object.keys(gameState.private.playerCards).find((key) =>
+      gameState.private.playerCards[key].find((playerCard) => playerCard.value === card.value)
+    )
+  ) {
+    settleFucked(gameState, clients);
+  } else {
+    gameState.public.countdown = 15;
+    if (gameState.private.countdownCallback) clearInterval(gameState.private.countdownCallback);
+    gameState.private.countdownCallback = beginCountdownTimer(gameState, clients);
+  }
 };
 
 export const settleFucked = (gameState, clients) => {
