@@ -1,14 +1,16 @@
 import { useEffect, useState } from 'react';
 import { Container } from 'semantic-ui-react';
 import PlayerChoiceModal from '../../components/player-choice-modal/PlayerChoiceModal';
+import RideTheBusActionModal from '../../components/ride-the-bus-action-modal/RideTheBusActionModal';
 import RideTheBusCardModal from '../../components/ride-the-bus-card-modal/RideTheBusCardModal';
 import TheBus from '../../components/the-bus/TheBus';
 import { GAME_STATE, PLAYER_ACTION, TIMEOUT_WARNING } from '../../constants/messages';
-import { CHOOSE } from '../../constants/statuses';
+import { CHOOSE, CONTINUE, END, TAKE_DRINK } from '../../constants/statuses';
 
 const RideTheBusPage = ({ playerId, gameState, ws, setGameState }) => {
   const [showPlayerChoiceModal, setShowPlayerChoiceModal] = useState(false);
   const [showRideTheBusModal, setShowRideTheBusModal] = useState(false);
+  const [showRideTheBusActionModal, setShowRideTheBusActionModal] = useState(false);
   const [guess, setGuess] = useState(null);
   const [cardPos, setCardPos] = useState(null);
 
@@ -65,6 +67,15 @@ const RideTheBusPage = ({ playerId, gameState, ws, setGameState }) => {
     setShowRideTheBusModal(cardPos && !guess);
   }, [guess, cardPos, setShowPlayerChoiceModal]);
 
+  useEffect(() => {
+    const playerStatus = gameState.players.find((player) => player.id === playerId).status;
+    setShowRideTheBusActionModal(playerStatus === TAKE_DRINK | playerStatus === END);
+  }, [gameState, setShowRideTheBusActionModal, playerId]);
+
+  useEffect(() => {
+    setShowPlayerChoiceModal(gameState.players.find((player) => player.id === playerId).status === CHOOSE);
+  }, [gameState, setShowPlayerChoiceModal, playerId]);
+
   const sendPlayerChoice = (target) => {
     const msgObject = {
       type: PLAYER_ACTION,
@@ -79,9 +90,21 @@ const RideTheBusPage = ({ playerId, gameState, ws, setGameState }) => {
     ws.send(msgString);
   };
 
+  const sendContinue = () => {
+    const msgObject = {
+      type: PLAYER_ACTION,
+      payload: {
+        action: CONTINUE
+      }
+    };
+    const msgString = JSON.stringify(msgObject);
+    ws.send(msgString);
+  };
+
   if (!gameState) return null;
 
   const { bus, currentPlayer, players } = gameState;
+  const playerStatus = players.find((player) => player.id === playerId).status;
 
   return (
     <>
@@ -90,13 +113,15 @@ const RideTheBusPage = ({ playerId, gameState, ws, setGameState }) => {
         thisPlayerId={playerId}
         players={players}
         setTarget={sendPlayerChoice}
+        rideTheBus
       />
+      <RideTheBusActionModal isOpen={showRideTheBusActionModal} status={playerStatus} takeDrink={sendContinue} />
       <RideTheBusCardModal isOpen={showRideTheBusModal} setGuess={setGuess} />
       <Container textAlign="center" className="ride-the-bus-page">
         <h2>
           <b>{players.find((player) => player.id === currentPlayer).name}</b> is currently riding the bus
         </h2>
-        <TheBus bus={bus} chooseCard={setCardPos} active={currentPlayer === playerId} />
+        <TheBus bus={bus} chooseCard={setCardPos} active={currentPlayer === playerId} status={playerStatus} />
       </Container>
     </>
   );

@@ -120,6 +120,7 @@ wss.on('connection', (ws) => {
               // TODO: this should be its own action
               gameState.public.game = RIDE_THE_BUS;
               gameState.private.deck = populateDeck(1);
+              setPlayerStatus(gameState, gameState.public.currentPlayer, CONTINUE);
               populateBus(gameState);
             }
             break;
@@ -139,7 +140,9 @@ wss.on('connection', (ws) => {
           case RIDE_THE_BUS:
             if (req.payload.action === CHOOSE) {
               if (req.payload.choice.target) {
+                setPlayerStatus(gameState, gameState.public.currentPlayer, null);
                 gameState.public.currentPlayer = req.payload.choice.target;
+                setPlayerStatus(gameState, gameState.public.currentPlayer, CONTINUE);
                 populateBus(gameState);
                 console.debug(`client ${ws.id}: bus transfered to player ${gameState.public.currentPlayer}`);
               } else {
@@ -148,6 +151,7 @@ wss.on('connection', (ws) => {
               }
             } else if (req.payload.action === CONTINUE) {
               populateBus(gameState);
+              setPlayerStatus(gameState, gameState.public.currentPlayer, CONTINUE);
               console.debug(`client ${ws.id}: bus refreshed`);
             }
           default:

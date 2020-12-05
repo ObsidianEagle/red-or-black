@@ -139,6 +139,7 @@ export const updateCurrentGame = (gameState) => {
       if (playersWithCards.length === 1) {
         gameState.public.game = RIDE_THE_BUS;
         gameState.public.currentPlayer = playersWithCards[0].id;
+        setPlayerStatus(gameState, playersWithCards[0].id, CONTINUE);
         gameState.private.deck = populateDeck(1);
         return RIDE_THE_BUS;
       }
@@ -329,22 +330,28 @@ export const populateBus = (gameState) => {
     Array(2).fill(null),
     Array(1).fill(null)
   ];
+
+  // FOR DEV PURPOSES
+  gameState.private.bus[1][1].value = 'JOKER';
+
+  if (gameState.private.bus[0][0].value === 'JOKER') populateBus(gameState);
 };
 
 export const handleRideTheBusChoice = (gameState, { cardPos: { row, col }, guess }) => {
-  const prevCardValue = cardValueToNumericalValue(gameState.public.bus[row - 1].find((card) => card));
-  const chosenCardValue = cardValueToNumericalValue(gameState.private.bus[row][col]);
+  const prevCardValue = cardValueToNumericalValue(gameState.public.bus[row - 1].find((card) => card).value);
+  const chosenCardValue = cardValueToNumericalValue(gameState.private.bus[row][col].value);
   gameState.public.bus[row][col] = gameState.private.bus[row][col];
 
   if (chosenCardValue === -1) {
-    gameState.public.players.find((player) => player.id === gameState.public.currentPlayer).status = CHOOSE;
+    gameState.public.players.find((player) => player.id === gameState.public.currentPlayer).status =
+      gameState.public.players.length > 1 ? CHOOSE : TAKE_DRINK;
   } else if (
     (guess === HIGHER && chosenCardValue > prevCardValue) ||
     (guess === LOWER && chosenCardValue < prevCardValue) ||
     (guess === SAME && chosenCardValue === prevCardValue)
   ) {
     gameState.public.players.find((player) => player.id === gameState.public.currentPlayer).status =
-      row === gameState.public.bus.cards.length - 1 ? END : CONTINUE;
+      row === gameState.public.bus.length - 1 ? END : CONTINUE;
   } else {
     gameState.public.players.find((player) => player.id === gameState.public.currentPlayer).status = TAKE_DRINK;
   }
