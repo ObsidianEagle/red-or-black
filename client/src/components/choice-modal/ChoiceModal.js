@@ -15,7 +15,7 @@ import {
 import CardChoiceModal from '../card-choice-modal/CardChoiceModal';
 import './ChoiceModal.scss';
 
-const ChoiceModal = ({ isOpen, playerCards, sendChoice }) => {
+const ChoiceModal = ({ isOpen, playerCards, sendChoice, skipToRideTheBus, players }) => {
   let headerText = '';
   let choices = [];
 
@@ -53,6 +53,12 @@ const ChoiceModal = ({ isOpen, playerCards, sendChoice }) => {
               {choice}
             </Button>
           ))}
+          {players.length < 2 ? (
+            <>
+              <br />
+              <Button onClick={skipToRideTheBus}>Ride The Bus</Button>
+            </>
+          ) : null}
         </Container>
       </Modal.Content>
     </Modal>

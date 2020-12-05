@@ -4,7 +4,7 @@ import CardsView from '../../components/cards-view/CardsView';
 import ChoiceModal from '../../components/choice-modal/ChoiceModal';
 import PlayerList from '../../components/player-list/PlayerList';
 import { GAME_STATE, PLAYER_ACTION, TIMEOUT_WARNING } from '../../constants/messages';
-import { CHOOSE, CONTINUE, GIVE_DRINK, TAKE_DRINK } from '../../constants/statuses';
+import { CHOOSE, CONTINUE, FUCK, GIVE_DRINK, TAKE_DRINK } from '../../constants/statuses';
 import './RedOrBlackPage.scss';
 
 const RedOrBlackPage = ({ playerId, gameState, ws, setGameState, playerCards, setPlayerCards }) => {
@@ -62,11 +62,28 @@ const RedOrBlackPage = ({ playerId, gameState, ws, setGameState, playerCards, se
     ws.send(msgString);
   };
 
+  const skipToRideTheBus = () => {
+    const msgObject = {
+      type: PLAYER_ACTION,
+      payload: {
+        action: FUCK
+      }
+    };
+    const msgString = JSON.stringify(msgObject);
+    ws.send(msgString);
+  };
+
   const playerStatus = players.find((player) => player.id === playerId).status;
 
   return (
     <>
-      <ChoiceModal isOpen={playerStatus === CHOOSE} playerCards={playerCards} sendChoice={sendChoice} />
+      <ChoiceModal
+        isOpen={playerStatus === CHOOSE}
+        playerCards={playerCards}
+        sendChoice={sendChoice}
+        skipToRideTheBus={skipToRideTheBus}
+        players={players}
+      />
       <Grid columns={2} stackable className="red-or-black-grid">
         <Grid.Column width={10} textAlign="center">
           <h3>Your Cards</h3>

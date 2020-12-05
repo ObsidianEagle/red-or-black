@@ -5,7 +5,7 @@ import readline from 'readline';
 import WebSocket from 'ws';
 import { EXIT, HELP, REMOVE_PLAYER, RESTART, SET_DECKS, SKIP, UPDATE } from './constants/commands.js';
 import { PLAYER_ACTION, PLAYER_INIT, SERVER_ERROR } from './constants/messages.js';
-import { CHOOSE, CONTINUE, FUCK_YOU, RED_OR_BLACK, RIDE_THE_BUS, TAKE_DRINK } from './constants/statuses.js';
+import { CHOOSE, CONTINUE, FUCK, FUCK_YOU, RED_OR_BLACK, RIDE_THE_BUS, TAKE_DRINK } from './constants/statuses.js';
 import {
   broadcastGameState,
   handleFuck,
@@ -115,6 +115,12 @@ wss.on('connection', (ws) => {
               setPlayerStatus(gameState, gameState.public.currentPlayer, CHOOSE);
               updateCurrentGame(gameState);
               console.debug(`client ${ws.id}: turn ended`);
+            } else if (req.payload.action === FUCK) {
+              // Skip straight to RTB
+              // TODO: this should be its own action
+              gameState.public.game = RIDE_THE_BUS;
+              gameState.private.deck = populateDeck(1);
+              populateBus(gameState);
             }
             break;
           case FUCK_YOU:

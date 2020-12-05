@@ -334,6 +334,7 @@ export const populateBus = (gameState) => {
 export const handleRideTheBusChoice = (gameState, { cardPos: { row, col }, guess }) => {
   const prevCardValue = cardValueToNumericalValue(gameState.public.bus[row - 1].find((card) => card));
   const chosenCardValue = cardValueToNumericalValue(gameState.private.bus[row][col]);
+  gameState.public.bus[row][col] = gameState.private.bus[row][col];
 
   if (chosenCardValue === -1) {
     gameState.public.players.find((player) => player.id === gameState.public.currentPlayer).status = CHOOSE;
