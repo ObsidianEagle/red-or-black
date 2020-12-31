@@ -331,9 +331,6 @@ export const populateBus = (gameState) => {
     Array(1).fill(null)
   ];
 
-  // FOR DEV PURPOSES
-  gameState.private.bus[1][1].value = 'JOKER';
-
   if (gameState.private.bus[0][0].value === 'JOKER') populateBus(gameState);
 };
 
